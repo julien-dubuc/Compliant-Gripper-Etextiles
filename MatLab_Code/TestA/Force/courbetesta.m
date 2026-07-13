@@ -1,6 +1,6 @@
 clc; clear; close all;
 %% 1. SETTINGS
-file_basename   = 'C2_F_'; %C1_F_   C2_F_  C3_F_ 
+file_basename   = 'C3_F_'; %C1_F_   C2_F_  C3_F_ 
 gripper_label   = regexprep(file_basename, '_F_?$', ''); 
 num_trials      = 5;
 marker_names    = {'BL', 'TR', 'MRR', 'ML', 'TM', 'TL', 'MLL', 'MR', 'BR'};
@@ -128,7 +128,7 @@ for trial = 1:num_trials
         valid = ~isnan(Xi) & ~isnan(Yi);
         if ~any(valid), continue; end
         
-        h_line = plot(Xi(valid), Yi(valid), '-', 'Color', [colors(m,:) 0.4], ...
+        h_line = plot(Xi(valid), Yi(valid), '-', 'Color', colors(m,:), ...
             'LineWidth', 1.5, 'DisplayName', marker_names{m});
         if trial == 1, h_trajectories(m) = h_line; end
         
@@ -145,21 +145,35 @@ h_start = scatter(NaN, NaN, 30, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 
 h_end   = scatter(NaN, NaN, 80, 'hexagram', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0.5 0.5 0.5]);
 legend([h_trajectories(ok), h_start, h_end], [marker_names(ok), {'Start Position', 'Max Force'}], ...
     'Location', 'eastoutside', 'FontSize', 10);
-title(sprintf('Gripper %s: Closing Kinematics (5 Trials)', gripper_label), 'FontSize', 14);
-%% 5. Y(t) EVOLUTION PLOTS
+title(sprintf('Gripper %s: Max Force Kinematics (5 Trials)', gripper_label), 'FontSize', 14);
+%% 5. Y(t) EVOLUTION PLOTS (VERTICAL "BUILDING" STACK)
+% Display order: Top to Bottom
+vertical_order = {'TL', 'TM', 'TR', 'MLL', 'ML', 'MR', 'MRR', 'BL', 'BR'};
+% Create a tall vertical figure
+figure('Name', ['Gripper ' gripper_label ' Y(t) Stack'], 'Color', 'w', 'Position', [100, 50, 900, 1200]);
+% tiledlayout for zero-spacing stacking
+t_layout = tiledlayout(length(vertical_order), 1, 'TileSpacing', 'none', 'Padding', 'compact');
+title(t_layout, sprintf('Gripper %s: Y(t) Evolution', gripper_label), 'FontSize', 14, 'FontWeight', 'bold');
+xlabel(t_layout, 'Time (s)', 'FontSize', 12);
+ylabel(t_layout, 'Y (mm)', 'FontSize', 12);
 gap_s = 1.0; % Gap duration between trials in seconds
-for m = 1:num_markers
-    figure('Name', ['Y evolution - ' marker_names{m}], 'Color', 'w', ...
-        'Position', [150+20*m, 100, 1100, 350]);
-    hold on; grid on;
-    xlabel('Cumulative Time (s)'); ylabel('Y Position (mm)');
-    title(sprintf('Gripper %s - Marker %s : Y evolution across 5 trials', gripper_label, marker_names{m}), ...
-        'FontSize', 13);
+for k = 1:length(vertical_order)
+    m_name = vertical_order{k};
+    m = find(strcmp(marker_names, m_name)); % Find index
+    
+    ax = nexttile;
+    hold(ax, 'on'); grid(ax, 'on');
     
     t_offset = 0;
     baseline_ref = [];
+    all_y_in_row = []; % To track min/max for dynamic margins
+    
     for trial = 1:num_trials
-        if isnan(col_map(m, trial)) || isempty(T{trial}), continue; end
+        if isnan(col_map(m, trial)) || isempty(T{trial})
+            t_offset = t_offset + gap_s;
+            continue; 
+        end
+        
         t = T{trial} - T{trial}(1) + t_offset;
         y = Y{m, trial};
         valid = ~isnan(y);
@@ -169,22 +183,58 @@ for m = 1:num_markers
             continue;
         end
         
-        plot(t(valid), y(valid), '-', 'Color', colors(m,:), 'LineWidth', 1.3, ...
-            'HandleVisibility', 'off');
-        xline(t_offset, ':', sprintf('Trial %d', trial), 'Color', [0.4 0.4 0.4], ...
-            'LabelVerticalAlignment', 'top', 'LabelHorizontalAlignment', 'left', ...
-            'FontSize', 8);
-            
+        all_y_in_row = [all_y_in_row; y(valid)];
+        
+        % Plot line
+        plot(ax, t(valid), y(valid), '-', 'Color', colors(m,:), 'LineWidth', 1.5);
+        
+        % Dotted line separating trials
+        xline(ax, t_offset, ':', 'Color', [0.7 0.7 0.7]);
+        
+        % Baseline
         if isempty(baseline_ref)
             n0 = max(1, round(0.01*sum(valid)));
             idxv = find(valid, n0, 'first');
             baseline_ref = median(y(idxv));
-            yline(baseline_ref, '--', 'Color', [0.85 0.2 0.2 0.5], 'DisplayName', 'Baseline');
+            yline(ax, baseline_ref, '--', 'Color', [0.85 0.2 0.2 0.5]);
         end
+        
         t_offset = t_offset + (T{trial}(end)-T{trial}(1)) + gap_s;
     end
-    xlim([0, max(t_offset - gap_s, 1)]);
+    
+    % Marker label in the top-left of the subplot
+    text(ax, 0.01, 0.85, m_name, 'Units', 'normalized', 'FontWeight', 'bold', ...
+         'FontSize', 10, 'Color', colors(m,:), 'BackgroundColor', 'w', 'EdgeColor', 'k');
+         
+    xlim(ax, [0, max(t_offset - gap_s, 1)]);
+    
+    % --- OVERLAP FIX (UNIVERSAL VERSION) ---
+    if ~isempty(all_y_in_row)
+        % 1. Add 15% padding to Y limits so data doesn't touch the very edge
+        y_min = min(all_y_in_row);
+        y_max = max(all_y_in_row);
+        y_range = y_max - y_min;
+        if y_range == 0, y_range = 1; end % Fallback safety
+        ylim(ax, [y_min - 0.15*y_range, y_max + 0.15*y_range]);
+    end
+    
+    % 2. Limit the number of Y-ticks by manually filtering the generated ticks
+    current_ticks = ax.YTick;
+    if length(current_ticks) >= 3
+        % Keep only the first, middle, and last tick to reduce edge clutter
+        ax.YTick = [current_ticks(1), current_ticks(round(end/2)), current_ticks(end)];
+    end
+    
+    % Remove X-axis labels for all but the last graph
+    if k < length(vertical_order)
+        xticklabels(ax, {});
+    end
 end
+%% 6. EXPORT GRAPHICS
+disp('Exporting images...');
+exportgraphics(figure(1), 'C3_pos.png', 'Resolution', 600);
+exportgraphics(figure(2), 'C3_Y.png', 'Resolution', 600);
+disp('Export complete!');
 %% LOCAL FUNCTIONS
 function [pos, valid] = get_slot_positions(coords, min_frac)
     % Returns median (X,Y) and validity mask for each slot
