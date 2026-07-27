@@ -73,7 +73,7 @@ for trial = 1:num_trials
         end
     end
 end
-%% 3. PREPROCESSING: OUTLIER FILTERING
+%% PREPROCESSING: OUTLIER FILTERIN
 X = cell(num_markers, num_trials);
 Y = cell(num_markers, num_trials);
 T = cell(1, num_trials);
