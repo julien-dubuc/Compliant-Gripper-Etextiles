@@ -26,12 +26,12 @@ The gripper was rigorously tested against a standard rigid rack-and-pinion mecha
 ## 🗂️ Repository Structure
 
 * 📁 **`Arduino_Code/`** : Scripts for controlling the Parallax continuous servo motor and reading the e-textile sensor data via a Wheatstone bridge.
-* 📁 **`CAD/`** : 3D models (STEP/STL/3MF) of the compliant gripper, the rigid reference gripper, testing setups, and the robotic arm adapter.
+* 📁 **`CAD/`** : 3D models (STEP) of the compliant gripper, the rigid reference gripper, testing setups, and the robotic arm adapter.
 * 📁 **`Certificates/`** : Mandatory laboratory safety, cybersecurity, and equipment training certificates completed during the internship.
 * 📁 **`E-textiles/`** : Files related to the e-textile sensors (embroidery patterns, characterization data, and images).
 * 📁 **`Literature/`** : State-of-the-art research review on soft robotics, self-locking mechanisms, and conductive yarns.
 * 📁 **`MatLab_Code/`** : Scripts used for real-time plotting, data logging, and generating the kinematic, hysteresis, and mechanical drift graphs.
-* 📁 **`Results/`** : Raw data and experimental results from force, current, power, and OptiTrack kinematics testing.
+* 📁 **`Results/`** : Raw data and experimental results.
 * 📁 **`Weekly reports/`** : Presentation slides tracking the project's progress and weekly R&D updates.
 
 ## 🛠️ Hardware & Software Used
