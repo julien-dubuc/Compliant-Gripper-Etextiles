@@ -1,4 +1,4 @@
-# Soft-Gripper-Etextiles 🦾
+# Soft-Gripper-Etextiles 
 
 **Development of an underactuated soft robotic gripper integrated with e-textile tactile sensors.** 
 
