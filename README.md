@@ -5,7 +5,7 @@
 
 This repository contains the hardware designs, source code, data, and documentation for an engineering internship project conducted at the **Tyndall National Institute** (MicroNano Systems / WSN Group) in Cork, Ireland.
 
-<video src="https://github.com/user-attachments/assets/3438f1ad-9275-46e3-9841-4bd983a9310e" width="600" controls="controls"></video>
+<video src="https://github.com/user-attachments/assets/d098759a-4877-4854-a7c8-ccd88dae9bc1" width="600" controls="controls"></video>
 
 ## 📝 Project Overview
 
