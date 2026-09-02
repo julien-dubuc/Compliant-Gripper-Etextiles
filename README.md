@@ -1,7 +1,7 @@
 
 # Soft-Gripper-Etextiles 
 
-**Development of an underactuated soft robotic gripper integrated with e-textile tactile sensors.** 
+**Development of a soft robotic gripper integrated with e-textile tactile sensors.** 
 
 This repository contains the hardware designs, source code, data, and documentation for an engineering internship project conducted at the **Tyndall National Institute** (MicroNano Systems / WSN Group) in Cork, Ireland.
 
@@ -13,7 +13,7 @@ Handling fragile objects safely is a complex challenge in robotics. Traditional 
 
 This project introduces a **3D-printed soft gripper** designed to solve these issues:
 1. **Zero-Energy Holding:** Utilizes a custom self-locking worm screw mechanism that maintains a firm grip on objects without consuming electrical power (0 Watts).
-2. **Compliant Design:** Underactuated (driven by a single servo motor) with flexible 3D-printed fingers that conform to the shape of heterogeneous and fragile objects.
+2. **Compliant Design:** Flexible 3D-printed fingers that conform to the shape of heterogeneous and fragile objects.
 3. **Smart Tactile Feedback:** Integration of embroidered e-textile sensors (Shieldex 117/17 conductive yarn) on the fingertips for contact detection.
 
 The gripper was rigorously tested against a standard rigid rack-and-pinion mechanism using an OptiTrack motion capture system, load cells, and SimScale FEA for geometric optimization.
